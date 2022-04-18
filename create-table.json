@@ -1,0 +1,13 @@
+{
+    "TableName": "ParkingLotTable",
+    "KeySchema": [
+      { "AttributeName": "TicketID", "KeyType": "HASH" }
+    ],
+    "AttributeDefinitions": [
+      { "AttributeName": "TicketID", "AttributeType": "S" }
+    ],
+    "ProvisionedThroughput": {
+      "ReadCapacityUnits": 5,
+      "WriteCapacityUnits": 5
+    }
+}
