@@ -2,7 +2,7 @@
 # debug
 # set -o xtrace
 
-ID=$(gdate +'%N')
+ID=$(date +'%N')
 KEY_NAME="cloud-course-$ID"
 KEY_PEM="$KEY_NAME.pem"
 
@@ -58,7 +58,15 @@ echo "deploying code to production"
 scp -vvv -i $KEY_PEM -o "StrictHostKeyChecking=no" -o "ConnectionAttempts=60" launch.sh ubuntu@$PUBLIC_IP:/home/ubuntu/
 
 echo "setup production environment"
-ssh -tt -i $KEY_PEM -o "StrictHostKeyChecking=no" -o "ConnectionAttempts=10" ubuntu@$PUBLIC_IP 'sh -e ./launch.sh && exit' < /dev/tty
+ssh -tt -i $KEY_PEM -o "StrictHostKeyChecking=no" -o "ConnectionAttempts=10" ubuntu@$PUBLIC_IP 'sh ./launch.sh' < /dev/tty
+ssh -i $KEY_PEM -o "StrictHostKeyChecking=no" -o "ConnectionAttempts=10" ubuntu@$PUBLIC_IP <<EOF
+    echo "Stating FastAPI server..."
+    cd app
+    nohup uvicorn main:app --host 0.0.0.0 --port 5000 &>/dev/null &
+    exit
+EOF
 
+wait 10
 echo "test that it all worked"
 curl  --retry-connrefused --retry 10 --retry-delay 1  http://$PUBLIC_IP:5000
+echo "log to http://$PUBLIC_IP:5000"
