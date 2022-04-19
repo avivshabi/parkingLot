@@ -1,7 +1,8 @@
+#!/bin/sh
 # debug
 # set -o xtrace
 
-ID=$(date +'%N')
+ID=$(gdate +'%N')
 KEY_NAME="cloud-course-$ID"
 KEY_PEM="$KEY_NAME.pem"
 
@@ -23,15 +24,15 @@ aws ec2 create-security-group   \
 MY_IP=$(curl ipinfo.io/ip)
 echo "My IP: $MY_IP"
 
-echo "setup rule allowing SSH access to $MY_IP only"
-aws ec2 authorize-security-group-ingress        \
-    --group-name $SEC_GRP --port 22 --protocol tcp \
-    --cidr $MY_IP/32
-
 echo "setup rule allowing HTTP (port 5000) access to $MY_IP only"
 aws ec2 authorize-security-group-ingress        \
     --group-name $SEC_GRP --port 5000 --protocol tcp \
-    --cidr $MY_IP/32
+    --cidr $MY_IP/32 >/dev/null
+
+echo "setup rule allowing SSH access to $MY_IP only"
+aws ec2 authorize-security-group-ingress        \
+    --group-name $SEC_GRP --port 22 --protocol tcp \
+    --cidr $MY_IP/32 >/dev/null
 
 UBUNTU_20_04_AMI="ami-042e8287309f5df03"
 
@@ -54,13 +55,10 @@ PUBLIC_IP=$(aws ec2 describe-instances  --instance-ids $INSTANCE_ID |
 echo "New instance $INSTANCE_ID @ $PUBLIC_IP"
 
 echo "deploying code to production"
-scp -i $KEY_PEM -o "StrictHostKeyChecking=no" -o "ConnectionAttempts=60" launch.sh ubuntu@$PUBLIC_IP:/home/ubuntu/
+scp -vvv -i $KEY_PEM -o "StrictHostKeyChecking=no" -o "ConnectionAttempts=60" launch.sh ubuntu@$PUBLIC_IP:/home/ubuntu/
 
 echo "setup production environment"
-ssh -i $KEY_PEM -o "StrictHostKeyChecking=no" -o "ConnectionAttempts=10" ubuntu@$PUBLIC_IP <<EOF
-    sh -e launch.sh
-    exit
-EOF
+ssh -tt -i $KEY_PEM -o "StrictHostKeyChecking=no" -o "ConnectionAttempts=10" ubuntu@$PUBLIC_IP 'sh -e ./launch.sh && exit' < /dev/tty
 
 echo "test that it all worked"
 curl  --retry-connrefused --retry 10 --retry-delay 1  http://$PUBLIC_IP:5000
