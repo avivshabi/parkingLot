@@ -20,12 +20,13 @@ app = FastAPI()
 @app.post(path=ENTRY_URL)
 async def enter(plate: str, parkingLot: str):
     try:
+        ticketId = uuid.uuid4().hex
         table.put_item(
             Item={
                 'PlateNumber': plate,
                 'ParkingLot': parkingLot,
                 'StartTime': int(time.time() // S_TO_MIN_CONST),
-                'TicketID': uuid.uuid4().hex
+                'TicketID': ticketId
             }
         )
     except ClientError as err:
@@ -34,7 +35,7 @@ async def enter(plate: str, parkingLot: str):
             detail=f"Couldn't park {plate} in {parkingLot}. Here's why: {err.response['Error']['Code']}: {err.response['Error']['Message']}"
         )
 
-    return {'status': 'parked'}
+    return {'ticketId': ticketId}
 
 
 @app.post(path=EXIT_URL)
