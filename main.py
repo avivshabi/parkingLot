@@ -8,7 +8,7 @@ from fastapi import FastAPI, HTTPException
 ENTRY_URL = '/entry'
 EXIT_URL = '/exit'
 TABLE = 'ParkingLotTable'
-S_TO_MIN_CONST = 60
+SEC_TO_MIN_CONST = 60
 CHARGE_TIME = 15
 FEE = 2.5
 
@@ -25,7 +25,7 @@ async def enter(plate: str, parkingLot: str):
             Item={
                 'PlateNumber': plate,
                 'ParkingLot': parkingLot,
-                'StartTime': int(time.time() // S_TO_MIN_CONST),
+                'StartTime': int(time.time() // SEC_TO_MIN_CONST),
                 'TicketID': ticketId
             }
         )
@@ -56,7 +56,7 @@ async def leave(ticketId: str):
             detail=f"Couldn't get vehicle with ticket id {ticketId}. Here's why: {err.response['Error']['Code']}: {err.response['Error']['Message']}"
         )
     else:
-        total_time = (time.time() // S_TO_MIN_CONST) - int(response['StartTime'])
+        total_time = (time.time() // SEC_TO_MIN_CONST) - int(response['StartTime'])
         total_cost = (total_time // CHARGE_TIME) * FEE
         return {
             'License Plate': response['PlateNumber'],
