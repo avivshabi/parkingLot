@@ -35,7 +35,7 @@ async def enter(plate: str, parkingLot: str):
             detail=f"Couldn't park {plate} in {parkingLot}. Here's why: {err.response['Error']['Code']}: {err.response['Error']['Message']}"
         )
 
-    return {'ticketId': ticketId}
+    return {'Ticket ID': ticketId}
 
 
 @app.post(path=EXIT_URL)
