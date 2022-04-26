@@ -1,6 +1,5 @@
 # Parking Lot Management Cloud Application
-A simple parking lot management cloud application using AWS EC2 & DynamoDB and written in Python.
-This is a school project I created as part of the course "Cloud Computing" I enrolled in during my studies.
+A simple parking lot management cloud application using AWS EC2 & DynamoDB and written in Python.  
 
 ## Run Locally (with a remote DynamoDB table)
 
@@ -34,7 +33,7 @@ path: /entry?plate=<CAR LICENSE PLATE NUM>&parkingLot=<PARKING LOT ID>
 body: None
 response type: json
 response: { 
-             ticketId: <GENERATED TICKET ID>
+             'Ticket ID': <GENERATED TICKET ID>
           }
 ```
 
@@ -43,7 +42,7 @@ response: {
 Deletes a car parking record from DynamoDB (if exists) and returns a receipt
 ```
 method: POST
-path: /exit?tIcketId=<GENERATED TICKET ID>
+path: /exit?ticketId=<GENERATED TICKET ID>
 body: None
 response type: json
 response: {
