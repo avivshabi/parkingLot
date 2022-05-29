@@ -53,6 +53,6 @@ response: {
           }
 ```
 
-```<CHARGE AMOUNT>``` is calculated according to a rate of 10$ per hour and based on 15 minutes increments (2.5$ per 15 minutes)
+```<CHARGE AMOUNT>``` is calculated according to a rate of 10USD per hour and based on 15 minutes increments (2.5USD per 15 minutes)
 
 ##### Please note that the app doesn't check for correctness of the input and assumes no malicious input is supplied
